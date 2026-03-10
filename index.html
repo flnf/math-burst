@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Math Burst: ¡Aventura de Multiplicación!</title>
+    
+    <!-- Child-friendly, highly legible web fonts from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Baloo+2:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- PWA Manifest and Meta Tags -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#FF9A9E">
+    <!-- iOS Support -->
+    <link rel="apple-touch-icon" href="assets/icon-192.png">
+    <meta name="apple-mobile-web-app-status-bar" content="#FF9A9E">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    
+    <!-- Main Application Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- The master container restricts the playable area for a consistent experience across desktop and mobile -->
+    <div id="game-container">
+        
+        <!-- ========================================== -->
+        <!-- SCREEN 1: Main Landing Menu                  -->
+        <!-- ========================================== -->
+        <div id="screen-main-menu" class="screen active">
+            <h1>Math Burst</h1>
+            <p>¡Explota los globos y apréndete las tablas!</p>
+            <!-- Large interactive call to action -->
+            <button id="btn-start" class="btn primary">¡Jugar Ahora!</button>
+            <br><br>
+            <!-- PWA Install Button (hidden by default until logic confirms it can be installed) -->
+            <button id="btn-install" class="btn secondary hidden" style="font-size: 1.2rem; padding: 10px 20px;">⬇️ Instalar App</button>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- SCREEN 2: Level (Multiplication Table) Select-->
+        <!-- ========================================== -->
+        <div id="screen-level-select" class="screen hidden">
+            <h2>Selecciona un Nivel</h2>
+            
+            <!-- Grid container where JS dynamically injects the 12 table buttons -->
+            <div id="level-grid" class="grid">
+                <!-- Buttons injected by UI.js -->
+            </div>
+            
+            <!-- Navigation back to main screen -->
+            <button id="btn-back-menu" class="btn secondary">Volver</button>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- SCREEN 3: Active Gameplay Loop               -->
+        <!-- ========================================== -->
+        // Setup gameplay container with HUD space
+        <div id="screen-gameplay" class="screen hidden">
+            
+            <!-- Heads Up Display (HUD) showing scores and health -->
+            <div id="hud">
+                <div class="hud-item score-container">Puntos: <span id="score">0</span></div>
+                <div class="hud-item combo-container hidden">Combo: x<span id="combo">1</span></div>
+                <div class="hud-item lives-container">
+                    <span id="lives">❤️❤️❤️</span>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div id="progress-container">
+                <div id="progress-bar"></div>
+            </div>
+            
+            <!-- The physical dropping zone for balloon elements -->
+            <div id="play-area">
+                <!-- Floating balloons injected dynamically by UI.js -->
+            </div>
+
+            <!-- The interaction zone where users type their answers -->
+            <div id="input-area">
+                <form id="answer-form">
+                    <input type="number" id="answer-input" placeholder="Escribe aquí..." autocomplete="off" autofocus>
+                    <button type="submit" class="btn submit">¡Paf!</button>
+                </form>
+            </div>
+            
+            <!-- Cute Astronaut Companion -->
+            <div id="astronaut-guide">
+                <div id="astronaut-bubble" class="hidden">¡Genial!</div>
+                <div class="astronaut-body">👨‍🚀</div>
+            </div>
+            
+        </div>
+
+        <!-- ========================================== -->
+        <!-- SCREEN 4: Game Over / Victory Summary        -->
+        <!-- ========================================== -->
+        <div id="screen-result" class="screen hidden">
+            <h2 id="result-title">¡Nivel Completado!</h2>
+            
+            <!-- Visual grade representation -->
+            <div class="stars" id="result-stars">⭐⭐⭐</div>
+            
+            <p>Puntuación: <span id="result-score">0</span></p>
+            <p id="result-message">¡Buen trabajo, has desbloqueado el siguiente!</p>
+            
+            <!-- Post-game navigation options -->
+            <div class="result-actions">
+                <button id="btn-retry" class="btn primary">Reintentar</button>
+                <button id="btn-next-level" class="btn primary">Siguiente</button>
+                <button id="btn-menu-from-result" class="btn secondary">Menú</button>
+            </div>
+        </div>
+        
+    </div>
+
+    <!-- ========================================== -->
+    <!-- Application Logic Scripts (Loaded in order)  -->
+    <!-- ========================================== -->
+    <script src="js/AudioManager.js"></script> <!-- Synthesizes app sounds -->
+    <script src="js/LevelManager.js"></script> <!-- Generates math problems -->
+    <script src="js/Game.js"></script>         <!-- Tracks player data and progress -->
+    <script src="js/UI.js"></script>           <!-- Orchestrates DOM transitions -->
+    <script src="js/app.js"></script>          <!-- Main execution loop and event binders -->
+</body>
+</html>
