@@ -38,6 +38,14 @@ document.addEventListener('DOMContentLoaded', () => {
 let deferredPrompt;
 const installBtn = document.getElementById('btn-install');
 
+// Detects if device is on iOS 
+const isIos = () => {
+    const userAgent = window.navigator.userAgent.toLowerCase();
+    return /iphone|ipad|ipod/.test(userAgent);
+};
+// Detects if device is in standalone mode
+const isInStandaloneMode = () => ('standalone' in window.navigator) && (window.navigator.standalone);
+
 // Register the Service Worker for offline support
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
@@ -51,32 +59,47 @@ if ('serviceWorker' in navigator) {
     });
 }
 
-// Handle the install prompt visually
-window.addEventListener('beforeinstallprompt', (e) => {
-    // Prevent the mini-infobar from appearing on mobile
-    e.preventDefault();
-    // Stash the event so it can be triggered later.
-    deferredPrompt = e;
-    // Update UI notify the user they can install the PWA
+if (isIos() && !isInStandaloneMode()) {
+    // Reveal the button specifically for iOS Users, but change functionality to an explanatory alert.
     if(installBtn) {
         installBtn.classList.remove('hidden');
+        installBtn.addEventListener('click', () => {
+            alert("Para instalar en iOS/iPadOS: toca el icono de 'Compartir' (el cuadrado con la flecha) y luego selecciona 'Añadir a la pantalla de inicio'.");
+        });
     }
-});
-
-if(installBtn) {
-    installBtn.addEventListener('click', async () => {
-        // Hide the app provided install promotion
-        installBtn.classList.add('hidden');
-        // Show the install prompt
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-            // Wait for the user to respond to the prompt
-            const { outcome } = await deferredPrompt.userChoice;
-            console.log(`User response to the install prompt: ${outcome}`);
-            // We've used the prompt, and can't use it again, throw it away
-            deferredPrompt = null;
+} else {
+    // Handle the standard Chrome/Android install prompt
+    window.addEventListener('beforeinstallprompt', (e) => {
+        // Prevent the mini-infobar from appearing on mobile
+        e.preventDefault();
+        // Stash the event so it can be triggered later.
+        deferredPrompt = e;
+        // Update UI notify the user they can install the PWA
+        if(installBtn) {
+            installBtn.classList.remove('hidden');
         }
     });
+
+    if(installBtn) {
+        installBtn.addEventListener('click', async () => {
+            // Hide the app provided install promotion
+            installBtn.classList.add('hidden');
+            // Show the install prompt
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                // Wait for the user to respond to the prompt
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log(`User response to the install prompt: ${outcome}`);
+                // We've used the prompt, and can't use it again, throw it away
+                deferredPrompt = null;
+            }
+            // For Desktop Safari or unexpected states that bypassed the iOS check
+            else {
+                alert("Si la instalación no se inicia automáticamente, abre el menú de tu navegador y busca la opción 'Instalar' o 'Añadir a la pantalla de inicio'.");
+                installBtn.classList.remove('hidden');
+            }
+        });
+    }
 }
 
     // Level Select -> Back Button
