@@ -38,6 +38,7 @@ class UI {
         
         // Aitana Companion
         this.aitanaBubble = document.getElementById('aitana-bubble');
+        this.aitanaAvatar = document.getElementById('aitana-avatar');
         
         // Manage active balloon DOM elements by ID for easy tracking and removal
         this.activeBalloons = new Map();
@@ -378,7 +379,7 @@ class UI {
     }
 
     /**
-     * Briefly displays a Spanish message in Aitana's speech bubble and speaks it aloud.
+     * Briefly displays a Spanish message in Aitana's speech bubble, speaks it aloud, and updates her animated GIF.
      * @param {string} text - The text to display and speak.
      * @param {string} type - 'correct' or 'wrong' for styling.
      */
@@ -388,13 +389,17 @@ class UI {
         this.aitanaBubble.innerText = text;
         this.aitanaBubble.style.color = type === 'correct' ? 'var(--color-correct)' : 'var(--color-wrong)';
         
+        // Swap to the reaction GIF
+        this.aitanaAvatar.src = type === 'correct' ? 'assets/aitana_happy.gif' : 'assets/aitana_sad.gif';
+        
         // Show bubble
         this.aitanaBubble.classList.remove('hidden');
         
-        // Hide after an interval
+        // Hide after an interval and restore normal GIF
         this.bubbleTimer = setTimeout(() => {
             this.aitanaBubble.classList.add('hidden');
-        }, 1500);
+            this.aitanaAvatar.src = 'assets/aitana_normal.gif';
+        }, 3000); // Increased slightly to let the GIF play out
 
         // Vocalize using Web Speech API TTS
         this.speak(text);
