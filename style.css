@@ -292,7 +292,7 @@ p {
     gap: 15px;
     width: 100%;
     max-width: 500px;
-    margin-right: 80px; /* Make room for the astronaut */
+    margin-right: 80px; /* Make room for Aitana */
 }
 
 /* Huge input text to make typing clear */
@@ -330,8 +330,8 @@ p {
     margin-top: 30px;
 }
 
-/* Astronaut Companion Style */
-#astronaut-guide {
+/* Aitana Companion Style */
+#aitana-guide {
     position: absolute;
     bottom: 15px;
     right: 30px;
@@ -342,18 +342,17 @@ p {
     pointer-events: none;
 }
 
-.astronaut-body {
-    font-size: 4rem;
-    animation: astronautFloat 4s ease-in-out infinite;
+.aitana-body {
+    animation: aitanaFloat 4s ease-in-out infinite;
     filter: drop-shadow(0 5px 5px rgba(0,0,0,0.2));
 }
 
-@keyframes astronautFloat {
+@keyframes aitanaFloat {
     0%, 100% { transform: translateY(0) rotate(-5deg); }
     50% { transform: translateY(-15px) rotate(5deg); }
 }
 
-#astronaut-bubble {
+#aitana-bubble {
     background: white;
     color: var(--color-btn-primary);
     font-family: var(--font-heading);
@@ -368,13 +367,13 @@ p {
     white-space: nowrap;
 }
 
-#astronaut-bubble.hidden {
+#aitana-bubble.hidden {
     opacity: 0;
     transform: translateY(10px) scale(0.8);
 }
 
 /* Little speech bubble tail */
-#astronaut-bubble::after {
+#aitana-bubble::after {
     content: '';
     position: absolute;
     bottom: -10px;

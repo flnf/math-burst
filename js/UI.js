@@ -36,15 +36,44 @@ class UI {
         // Progress Bar
         this.progressBarEl = document.getElementById('progress-bar');
         
-        // Astronaut Companion
-        this.astronautBubble = document.getElementById('astronaut-bubble');
+        // Aitana Companion
+        this.aitanaBubble = document.getElementById('aitana-bubble');
         
         // Manage active balloon DOM elements by ID for easy tracking and removal
         this.activeBalloons = new Map();
         
-        // Spanish dialogue arrays for the Astronaut
+        // Spanish dialogue arrays for Aitana
         this.dialogueCorrect = ["¡Genial!", "¡Muy bien!", "¡Excelente!", "¡Súper!", "¡Bravo!"];
         this.dialogueWrong = ["¡Ups!", "¡Intenta otra vez!", "¡Casi!", "¡Tú puedes!"];
+        
+        // Voice caching for TTS
+        this.aitanaVoice = null;
+        this.initTTS();
+    }
+
+    /**
+     * Initializes the SpeechSynthesis API and selects a suitable Spanish female voice.
+     */
+    initTTS() {
+        if (!('speechSynthesis' in window)) return;
+        
+        const setVoice = () => {
+            const voices = window.speechSynthesis.getVoices();
+            // Try to find a Spanish voice, preferably a female sounding one (often default or indicated in name)
+            // 'es-ES' indicates default Spanish from Spain
+            const spanishVoices = voices.filter(v => v.lang.startsWith('es'));
+            // Prioritize specific known good voices if possible, otherwise just grab a Spanish one
+            this.aitanaVoice = spanishVoices.find(v => v.name.includes('Monica')) || 
+                               spanishVoices.find(v => v.name.includes('Helena')) ||
+                               spanishVoices.find(v => v.lang === 'es-ES') || 
+                               spanishVoices[0] || null;
+        };
+
+        // Voices are loaded asynchrnously
+        setVoice();
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = setVoice;
+        }
     }
 
     /**
@@ -215,18 +244,18 @@ class UI {
                     this.spawnFloatingScore(el, points);
                 }
                 
-                // Astronaut Cheer
+                // Aitana Cheer
                 const msg = this.dialogueCorrect[Math.floor(Math.random() * this.dialogueCorrect.length)];
-                this.showAstronautMessage(msg, 'correct');
+                this.showAitanaMessage(msg, 'correct');
                 
             } else {
                 // Misses or wrong answers fall sadly greyscale with a funny bounce
                 el.classList.add('pop-wrong');
                 el.style.backgroundColor = 'var(--color-wrong)';
                 
-                // Astronaut Encouragement
+                // Aitana Encouragement
                 const msg = this.dialogueWrong[Math.floor(Math.random() * this.dialogueWrong.length)];
-                this.showAstronautMessage(msg, 'wrong');
+                this.showAitanaMessage(msg, 'wrong');
             }
             
             // Clean up the DOM element entirely after the CSS scale/fade completes
@@ -349,23 +378,50 @@ class UI {
     }
 
     /**
-     * Briefly displays a Spanish message in the Astronaut's speech bubble.
-     * @param {string} text - The text to display.
+     * Briefly displays a Spanish message in Aitana's speech bubble and speaks it aloud.
+     * @param {string} text - The text to display and speak.
      * @param {string} type - 'correct' or 'wrong' for styling.
      */
-    showAstronautMessage(text, type) {
+    showAitanaMessage(text, type) {
         if(this.bubbleTimer) clearTimeout(this.bubbleTimer);
         
-        this.astronautBubble.innerText = text;
-        this.astronautBubble.style.color = type === 'correct' ? 'var(--color-correct)' : 'var(--color-wrong)';
+        this.aitanaBubble.innerText = text;
+        this.aitanaBubble.style.color = type === 'correct' ? 'var(--color-correct)' : 'var(--color-wrong)';
         
         // Show bubble
-        this.astronautBubble.classList.remove('hidden');
+        this.aitanaBubble.classList.remove('hidden');
         
         // Hide after an interval
         this.bubbleTimer = setTimeout(() => {
-            this.astronautBubble.classList.add('hidden');
+            this.aitanaBubble.classList.add('hidden');
         }, 1500);
+
+        // Vocalize using Web Speech API TTS
+        this.speak(text);
+    }
+
+    /**
+     * Wrapper to trigger Web Speech API text-to-speech.
+     * @param {string} text - Text to speak.
+     */
+    speak(text) {
+        if (!('speechSynthesis' in window)) return;
+        
+        // Optional: Cut off any currently playing speech to keep it responsive and punchy
+        window.speechSynthesis.cancel();
+        
+        const utterance = new SpeechSynthesisUtterance(text);
+        if (this.aitanaVoice) {
+            utterance.voice = this.aitanaVoice;
+        } else {
+            utterance.lang = 'es-ES'; // Fallback
+        }
+        
+        // Tweak voice characteristics for a cuter, friendlier presentation
+        utterance.pitch = 1.3;
+        utterance.rate = 1.1;
+        
+        window.speechSynthesis.speak(utterance);
     }
 
     /**
